@@ -1,6 +1,7 @@
 <html> 
 <head> </head>
 <body>
+<h1>
 var config = {
     type: Phaser.AUTO,
     width: 800,
@@ -149,7 +150,8 @@ else
 if (cursors.up.isDown && player.body.touching.down)
 {
     player.setVelocityY(-330);
-}
-
+} </h1>
+</body>
+</html>
 
 
