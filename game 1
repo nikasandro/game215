@@ -1,0 +1,4 @@
+const
+const game=new phaser.game(config);
+this load.imege
+this imupt keybord.on(keydown.space)
