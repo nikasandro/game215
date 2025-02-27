@@ -1,4 +1,9 @@
-const
+const menu=(
+preload function()(
+this load.image(bakgrount assets/sky.png
+create function()(
+const fight=(sword fight)
 const game=new phaser.game(config);
 this load.imege
 this imupt keybord.on(keydown.space)
+scine.ad
