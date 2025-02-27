@@ -1,4 +1,5 @@
 <!doctype.html>
+lang=html
 const menu=(
 preload function()(
 {
