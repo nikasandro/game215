@@ -31,13 +31,12 @@
         }
 
         function create() {
-            const background = this.add.sprite(0, 0, 'goat').setOrigin(0, 0);
+            this.add.image(400, 300, 'goat');
 
             const text = this.add.text(400, 300, 'Scene 1 - Press Space to Transition', {
                 fontSize: '24px',
                 fill: '#fff'
-            });
-            text.setOrigin(0.5);
+            }).setOrigin(0.5);
 
             const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
@@ -51,11 +50,12 @@
         const goat = {
             preload: function () {},
             create: function () {
+                this.add.image(400, 300, 'goat');
+
                 const text = this.add.text(400, 300, 'goat - Press Space to Go Back', {
                     fontSize: '24px',
                     fill: '#fff'
-                });
-                text.setOrigin(0.5);
+                }).setOrigin(0.5);
 
                 this.input.keyboard.on('keydown-SPACE', function (event) {
                     this.scene.start('default');
@@ -69,11 +69,12 @@
                 this.load.image('bird', './bird.jpeg');
             },
             create: function () {
+                this.add.image(400, 300, 'bird');
+
                 const text = this.add.text(400, 300, 'bird - Press Space to Go Back', {
                     fontSize: '24px',
                     fill: '#fff'
-                });
-                text.setOrigin(0.5);
+                }).setOrigin(0.5);
 
                 this.input.keyboard.on('keydown-SPACE', function (event) {
                     this.scene.start('default');
