@@ -47,7 +47,7 @@
             // Set up an event listener for the space key
             this.input.keyboard.on('keydown-SPACE', function (event) {
             // Transition to the next scene
-            this.scene.start('goat.jpeg');
+            this.scene.start('goat');
             }, this);
             }
             // Update function for game logic
@@ -74,10 +74,32 @@
             update: function () {
             // Additional updates for Scene2 if needed
             }
+             const bird= {
+            preload: function () {
+            // Additional preload for Scene2 if needed
+                this.load.image('bird', bird.jpeg');
+            },
+            create: function () {
+            // Additional setup for Scene2
+            const text = this.add.text(400, 300, 'bird - Press Space to Go Back', {
+            fontSize: '24px',
+            fill: '#fff'
+            });
+            text.setOrigin(0.5);
+            // Set up an event listener for the space key to go back to Scene1
+            this.input.keyboard.on('keydown-SPACE', function (event) {
+            this.scene.start('bird');
+            }, this);
+            },
+            update: function () {
+            // Additional updates for Scene2 if needed
+            }
+                
             };
             // Add both scenes to the game
-            game.scene.add('default', Scene1);
+            game.scene.add('default', goat);
             game.scene.add('goat', goat);
+            game.scene.add('bird', bird);
             // Start the initial scene
             game.scene.start('goat');
     </script>
