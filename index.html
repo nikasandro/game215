@@ -1,67 +1,150 @@
-=<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Image Switcher</title>
+    <title>Scenes</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            overflow: hidden; /* Prevent scrolling */
-        }
-        img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Ensure the image covers the entire screen */
-        }
-        #message {
-            position: absolute;
-            color: white;
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-            z-index: 10; /* Make sure the text is above the image */
         }
     </style>
 </head>
 <body>
 
-    <img id="image" src="https://assets.onecompiler.app/43av4tynn/43av4tdft/goat.jpeg" alt="Image" />
-    <div id="message">Press Space to move</div>
-
     <script type="text/javascript">
-        // List of image URLs
-        const images = [
-            'https://assets.onecompiler.app/43av4tynn/43av4tdft/goat.jpeg',
-            'https://assets.onecompiler.app/43av4tynn/43av4tdft/dog.jpeg',
-            'https://assets.onecompiler.app/43av4tynn/43av4tdft/cat.png',
-            'https://assets.onecompiler.app/43av4tynn/43av4tdft/bird.jpeg',
-            'https://assets.onecompiler.app/43av4tynn/43av4tdft/ship.jpeg'
-        ];
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+        const game = new Phaser.Game(config);
 
-        let currentIndex = 0; // Track the current image index
-
-        // Function to change the image
-        function changeImage() {
-            // Increment the index and loop back to 0 when we reach the end
-            currentIndex = (currentIndex + 1) % images.length;
-            const imageElement = document.getElementById('image');
-            imageElement.src = images[currentIndex]; // Set new image
+        function preload() {
+            // Load images from the same folder as the HTML file
+            this.load.image('goat', 'goat.jpeg');
+            this.load.image('dog', 'dog.jpeg');
+            this.load.image('cat', 'cat.jpeg');
+            this.load.image('bird', 'bird.jpeg');
+            this.load.image('ship', 'ship.jpeg');
         }
 
-        // Listen for Space key press to change the image
-        document.addEventListener('keydown', function(event) {
-            if (event.code === 'Space') {
-                changeImage();
-            }
-        });
-    </script>
+        function create() {
+            this.add.image(400, 300, 'goat');
 
+            const text = this.add.text(400, 300, 'Scene 1 - Press Space to Transition', {
+                fontSize: '24px',
+                fill: '#fff'
+            }).setOrigin(0.5);
+
+            const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+            this.input.keyboard.on('keydown-SPACE', function (event) {
+                this.scene.start('dog');  // Transition to 'dog' scene on space key press
+            }, this);
+        }
+
+        function update() {}
+
+        const goat = {
+            preload: function () {},
+            create: function () {
+                this.add.image(400, 300, 'goat');
+
+                const text = this.add.text(400, 300, 'Goat - Press Space to Change Scene', {
+                    fontSize: '24px',
+                    fill: '#fff'
+                }).setOrigin(0.5);
+
+                this.input.keyboard.on('keydown-SPACE', function (event) {
+                    this.scene.start('dog');  // Go to the 'dog' scene
+                }, this);
+            },
+            update: function () {}
+        };
+
+        const dog = {
+            preload: function () {},
+            create: function () {
+                this.add.image(400, 300, 'dog');
+
+                const text = this.add.text(400, 300, 'Dog - Press Space to Change Scene', {
+                    fontSize: '24px',
+                    fill: '#fff'
+                }).setOrigin(0.5);
+
+                this.input.keyboard.on('keydown-SPACE', function (event) {
+                    this.scene.start('cat');  // Go to the 'cat' scene
+                }, this);
+            },
+            update: function () {}
+        };
+
+        const cat = {
+            preload: function () {},
+            create: function () {
+                this.add.image(400, 300, 'cat');
+
+                const text = this.add.text(400, 300, 'Cat - Press Space to Change Scene', {
+                    fontSize: '24px',
+                    fill: '#fff'
+                }).setOrigin(0.5);
+
+                this.input.keyboard.on('keydown-SPACE', function (event) {
+                    this.scene.start('bird');  // Go to the 'bird' scene
+                }, this);
+            },
+            update: function () {}
+        };
+
+        const bird = {
+            preload: function () {},
+            create: function () {
+                this.add.image(400, 300, 'bird');
+
+                const text = this.add.text(400, 300, 'Bird - Press Space to Change Scene', {
+                    fontSize: '24px',
+                    fill: '#fff'
+                }).setOrigin(0.5);
+
+                this.input.keyboard.on('keydown-SPACE', function (event) {
+                    this.scene.start('ship');  // Go to the 'ship' scene
+                }, this);
+            },
+            update: function () {}
+        };
+
+        const ship = {
+            preload: function () {},
+            create: function () {
+                this.add.image(400, 300, 'ship');
+
+                const text = this.add.text(400, 300, 'Ship - Press Space to Go Back', {
+                    fontSize: '24px',
+                    fill: '#fff'
+                }).setOrigin(0.5);
+
+                this.input.keyboard.on('keydown-SPACE', function (event) {
+                    this.scene.start('goat');  // Go back to the 'goat' scene
+                }, this);
+            },
+            update: function () {}
+        };
+
+        // Add all scenes to the game
+        game.scene.add('goat', goat);
+        game.scene.add('dog', dog);
+        game.scene.add('cat', cat);
+        game.scene.add('bird', bird);
+        game.scene.add('ship', ship);
+
+        // Start the game with the goat scene
+        game.scene.start('goat');
+    </script>
 </body>
 </html>
