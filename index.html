@@ -1,8 +1,8 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
-    <title>scines</title>
+    <title>scenes</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -13,98 +13,50 @@
 <body>
 
     <script type="text/javascript">
-            // Create a new Phaser Game instance with a configuration object
-            const config = {
+        // Create a new Phaser Game instance with a configuration object
+        const config = {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
             scene: {
-            // Initial scene
-            preload: preload,
-            create: create,
-            update: update
+                preload: preload,
+                create: create,
+                update: update
             }
-            };
-            const game = new Phaser.Game(config);
-            // Preload function for loading assets
-            function preload() {
+        };
+        const game = new Phaser.Game(config);
+
+        // Preload function for loading assets
+        function preload() {
             // Load your assets here (images, spritesheets, etc.)
             this.load.image('goat', 'goat.jpeg');
-            }
-            // Create function for initializing game objects
-            function create() {
+        }
+
+        // Create function for initializing game objects
+        function create() {
             // Add a background sprite
             const background = this.add.sprite(0, 0, 'goat').setOrigin(0, 0);
+
             // Set up a text object to display scene information
             const text = this.add.text(400, 300, 'Scene 1 - Press Space to Transition', {
-            fontSize: '24px',
-            fill: '#fff'
+                fontSize: '24px',
+                fill: '#fff'
             });
             text.setOrigin(0.5);
+
             // Define a key for transitioning to the next scene
             const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
             // Set up an event listener for the space key
             this.input.keyboard.on('keydown-SPACE', function (event) {
-            // Transition to the next scene
-            this.scene.start('goat');
+                // Transition to the next scene
+                this.scene.start('goat');
             }, this);
-            }
-            // Update function for game logic
-            function update() {
+        }
+
+        // Update function for game logic
+        function update() {
             // Add any game logic or updates here
-            }
-            // Define a second scene
-            const goat= {
-            preload: function () {
-            // Additional preload for Scene2 if needed
-            },
-            create: function () {
-            // Additional setup for Scene2
-            const text = this.add.text(400, 300, 'goat - Press Space to Go Back', {
-            fontSize: '24px',
-            fill: '#fff'
-            });
-            text.setOrigin(0.5);
-            // Set up an event listener for the space key to go back to Scene1
-            this.input.keyboard.on('keydown-SPACE', function (event) {
-            this.scene.start('default');
-            }, this);
-            },
-            update: function () {
-            // Additional updates for Scene2 if needed
-            }
-                
-            const bird= {
-            preload: function () {
-            // Additional preload for Scene2 if needed
-                this.load.image('bird', bird.jpeg');
-            },
-            create: function () {
-            // Additional setup for Scene2
-            const text = this.add.text(400, 300, 'bird - Press Space to Go Back', {
-            fontSize: '24px',
-            fill: '#fff'
-            });
-            text.setOrigin(0.5);
-            // Set up an event listener for the space key to go back to Scene1
-            this.input.keyboard.on('keydown-SPACE', function (event) {
-            this.scene.start('bird');
-            }, this);
-            },
-            update: function () {
-            // Additional updates for Scene2 if needed
-            }
-                
-            };
-            // Add both scenes to the game
-            game.scene.add('default', goat);
-            game.scene.add('goat', goat);
-            game.scene.add('bird', bird);
-            // Start the initial scene
-            game.scene.start('goat');
-    </script>
-</body>
-</html>
+        }
 
-
-
+        // Define a second scene
