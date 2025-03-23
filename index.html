@@ -74,7 +74,7 @@
                 player.anims.play('right', true);
             } else {
                 player.setVelocityX(0);
-                if (player.anims.exists('turn')) {
+                if (player.anims.currentAnim && player.anims.currentAnim.key !== 'turn') {
                     player.anims.play('turn');
                 }
             }
@@ -93,12 +93,13 @@
         }
 
         function hitEnemy(player, enemy) {
-            this.scene.physics.pause();
+            this.physics.world.pause(); // Corrected physics pause
             player.setTint(0xff0000);
-            if (player.anims.exists('turn')) {
-                player.anims.play('turn');
-            }
+            player.anims.play('turn'); 
             this.add.text(300, 300, 'Game Over!', { fontSize: '48px', fill: '#fff' });
+
+            // Restart game after delay
+            this.time.delayedCall(2000, () => this.scene.restart(), [], this);
         }
     </script>
 </body>
