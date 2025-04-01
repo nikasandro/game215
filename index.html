@@ -1,74 +1,110 @@
-<!doctypehtml>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ball Animation</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 2px solid black;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+    </style>
+</head>
 <body>
-<canvas id="animationCanvas" width="1862" height="904"> </canvas>
- <button type="button" id="startButton">Start</button>
-// Get the canvas and button elements
-const canvas = document.getElementById("animationCanvas");
-const ctx = canvas.getContext("2d");
-const startButton = document.getElementById("startButton");
-//define a stop button and save that to add to your click event handler
 
-// Initialize the canvas size to full screen
-canvas.width = innerWidth -50;
-canvas.height = innerHeight -50;
+    <canvas id="animationCanvas"></canvas>
+    <div class="controls">
+        <button type="button" id="startButton">Start</button>
+        <button type="button" id="stopButton">Stop</button>
+    </div>
 
-// Ball properties
-const ball = {
-    x: canvas.width / 2,
-    y: canvas.height - 30,
-    radius: 20,
-    color: "orange",
-    velocityX: 6,
-    velocityY: 4,
-};
+    <script>
+        // Get the canvas and button elements
+        const canvas = document.getElementById("animationCanvas");
+        const ctx = canvas.getContext("2d");
+        const startButton = document.getElementById("startButton");
+        const stopButton = document.getElementById("stopButton");
 
-let animationId = null; // To track the animation frame
+        // Initialize the canvas size to full screen
+        canvas.width = window.innerWidth - 50;
+        canvas.height = window.innerHeight - 50;
 
-// Function to draw the ball
-function drawBall() {
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = ball.color;
-    ctx.fill();
-    ctx.closePath();
-}
+        // Ball properties
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 20,
+            color: "orange",
+            velocityX: 6,
+            velocityY: 4,
+        };
 
-// Function to update ball position
-function updateBallPosition() {
-    // Update ball position based on velocity
-    ball.x += ball.velocityX;
-    ball.y += ball.velocityY;
+        let animationId = null; // To track the animation frame
 
-    // Bounce the ball when it hits the canvas boundaries
-    if (ball.x + ball.velocityX > canvas.width - ball.radius || ball.x + ball.velocityX < ball.radius) {
-        ball.velocityX = -ball.velocityX;
-    }
-    if (ball.y + ball.velocityY > canvas.height - ball.radius || ball.y + ball.velocityY < ball.radius) {
-        ball.velocityY = -ball.velocityY;
-    }
-}
+        // Function to draw the ball
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.closePath();
+        }
 
-// Function to clear the canvas
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+        // Function to update ball position
+        function updateBallPosition() {
+            ball.x += ball.velocityX;
+            ball.y += ball.velocityY;
 
-// Game loop - Animation
-function animate() {
-    clearCanvas();
-    drawBall();
-    updateBallPosition();
-    animationId = requestAnimationFrame(animate); // Loop the animation and save the return value 
-}
+            // Bounce the ball when it hits the canvas boundaries
+            if (ball.x + ball.radius >= canvas.width || ball.x - ball.radius <= 0) {
+                ball.velocityX = -ball.velocityX;
+            }
+            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
+                ball.velocityY = -ball.velocityY;
+            }
+        }
 
-// Start Animation button click event
-startButton.addEventListener("click", function() {
-    if (!animationId) {
-        animate();
-    }
-});
+        // Function to clear the canvas
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
-// Stop Animation button click event
+        // Animation loop
+        function animate() {
+            clearCanvas();
+            drawBall();
+            updateBallPosition();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Start Animation
+        startButton.addEventListener("click", function () {
+            if (!animationId) {
+                animate();
+            }
+        });
+
+        // Stop Animation
+        stopButton.addEventListener("click", function () {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        });
+    </script>
+
 </body>
 </html>
+
