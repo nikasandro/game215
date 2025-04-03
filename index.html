@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ball Animation</title>
+    <title>Phaser Ball Animation</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -24,84 +25,79 @@
 </head>
 <body>
 
-    <canvas id="animationCanvas"></canvas>
+    <div id="phaser-game"></div>
     <div class="controls">
-        <button type="button" id="startButton">Start</button>
-        <button type="button" id="stopButton">Stop</button>
+        <button id="startButton">Start</button>
+        <button id="stopButton">Stop</button>
     </div>
 
     <script>
-        const canvas = document.getElementById("animationCanvas");
-        const ctx = canvas.getContext("2d");
-        const startButton = document.getElementById("startButton");
-        const stopButton = document.getElementById("stopButton");
+        let game; // Phaser game instance
+        let ball; // Ball sprite
+        let ballVelocityX = 200; // Speed on X
+        let ballVelocityY = 150; // Speed on Y
 
-        // Load the ball image
-        const ballImage = new Image();
-        ballImage.src = "78-782202_free-png-download-ping-pong-ball-clipart-png.png"; // Ensure the image is in the correct location
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth - 50;
-            canvas.height = window.innerHeight - 50;
-
-            if (ball.x + ball.radius > canvas.width) ball.x = canvas.width - ball.radius;
-            if (ball.y + ball.radius > canvas.height) ball.y = canvas.height - ball.radius;
-        }
-
-        // Ball properties
-        const ball = {
-            x: 100,
-            y: 100,
-            radius: 20,
-            velocityX: 6,
-            velocityY: 4,
-            imageSize: 40 // Image size (adjust as needed)
+        // Phaser Game Configuration
+        const config = {
+            type: Phaser.AUTO,
+            parent: "phaser-game",
+            width: window.innerWidth - 50,
+            height: window.innerHeight - 100,
+            physics: {
+                default: "arcade",
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
         };
 
-        let animationId = null;
-
-        function drawImageBall() {
-            ctx.drawImage(ballImage, ball.x - ball.imageSize / 2, ball.y - ball.imageSize / 2, ball.imageSize, ball.imageSize);
+        function preload() {
+            this.load.image("ball", "https://upload.wikimedia.org/wikipedia/commons/7/7a/Basketball.png");
         }
 
-        function updateBallPosition() {
-            ball.x += ball.velocityX;
-            ball.y += ball.velocityY;
+        function create() {
+            // Ball properties
+            ball = this.physics.add.image(100, 100, "ball").setScale(0.1);
+            ball.setVelocity(ballVelocityX, ballVelocityY);
+            ball.setBounce(1, 1); // Makes it bounce on walls
+            ball.setCollideWorldBounds(true); // Keep ball inside canvas
 
-            if (ball.x + ball.radius >= canvas.width || ball.x - ball.radius <= 0) {
-                ball.velocityX = -ball.velocityX;
-            }
-            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
-                ball.velocityY = -ball.velocityY;
+            // Resize game when window resizes
+            window.addEventListener("resize", resizeGame);
+        }
+
+        function update() {
+            // Game loop (not needed much since physics handles movement)
+        }
+
+        function resizeGame() {
+            if (game) {
+                game.scale.resize(window.innerWidth - 50, window.innerHeight - 100);
             }
         }
 
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function startGame() {
+            if (!game) {
+                game = new Phaser.Game(config);
+            }
         }
 
-        function animate() {
-            clearCanvas();
-            drawImageBall();
-            updateBallPosition();
-            animationId = requestAnimationFrame(animate);
+        function stopGame() {
+            if (game) {
+                game.destroy(true); // Properly destroy Phaser instance
+                game = null;
+            }
         }
 
-        startButton.addEventListener("click", function () {
-            if (!animationId) {
-                animate();
-            }
-        });
-
-        stopButton.addEventListener("click", function () {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-        });
-
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
+        // Button event listeners
+        document.getElementById("startButton").addEventListener("click", startGame);
+        document.getElementById("stopButton").addEventListener("click", stopGame);
     </script>
 
 </body>
