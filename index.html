@@ -2,44 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dino Game</title>
+  <title>Dino Game Deluxe</title>
   <style>
     body {
       margin: 0;
-      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
       background: #f4f4f4;
-      font-family: sans-serif;
+      overflow: hidden;
+      transition: background 0.3s;
     }
 
     #game {
       position: relative;
       width: 100vw;
       height: 100vh;
+      background: #fff;
+      border-bottom: 3px solid #444;
       overflow: hidden;
-      background-color: white;
-      border: 2px solid #333;
     }
 
     #dino {
       position: absolute;
       bottom: 0;
       left: 50px;
-      width: 40px;
-      height: 40px;
-      background: #333;
+      width: 48px;
+      height: 48px;
+      background-image: url('https://i.imgur.com/OV8I1DQ.png');
+      background-size: cover;
     }
 
     .obstacle {
       position: absolute;
       bottom: 0;
-      width: 20px;
-      height: 40px;
-      background: #555;
+      width: 25px;
+      height: 50px;
+      background-image: url('https://i.imgur.com/N5uCbDu.png');
+      background-size: cover;
       animation: moveObstacle 2s linear infinite;
     }
 
     @keyframes moveObstacle {
-      from { right: -20px; }
+      from { right: -30px; }
       to { right: 100vw; }
     }
 
@@ -49,66 +52,162 @@
 
     @keyframes jump {
       0%   { bottom: 0; }
-      50%  { bottom: 100px; }
+      50%  { bottom: 120px; }
       100% { bottom: 0; }
     }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    #nightToggle {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 5px 10px;
+      background: #eee;
+      border-radius: 8px;
+      user-select: none;
+    }
+
+    #gameOver {
+      display: none;
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    #gameOver h1 {
+      margin: 0;
+      font-size: 48px;
+      color: red;
+    }
+
+    #restart {
+      padding: 10px 20px;
+      font-size: 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+    }
+
+    .night {
+      background: #222;
+    }
+
+    .night #game {
+      background: #111;
+    }
+
+    .night #score, .night #nightToggle {
+      color: #eee;
+    }
+
   </style>
 </head>
 <body>
+  <div id="nightToggle">🌙</div>
   <div id="game">
     <div id="dino"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameOver">
+      <h1>Game Over!</h1>
+      <button id="restart">Restart</button>
+    </div>
   </div>
 
   <script>
     const dino = document.getElementById("dino");
     const game = document.getElementById("game");
+    const scoreDisplay = document.getElementById("score");
+    const gameOverScreen = document.getElementById("gameOver");
+    const restartBtn = document.getElementById("restart");
+    const toggleBtn = document.getElementById("nightToggle");
+    let score = 0;
+    let isGameOver = false;
 
-    // Jump logic
-    document.addEventListener("keydown", function (event) {
-      if (event.code === "Space" || event.key === "ArrowUp") {
-        if (!dino.classList.contains("jump")) {
-          dino.classList.add("jump");
-          setTimeout(() => dino.classList.remove("jump"), 500);
-        }
+    // Jump
+    document.addEventListener("keydown", e => {
+      if ((e.code === "Space" || e.key === "ArrowUp") && !dino.classList.contains("jump")) {
+        dino.classList.add("jump");
+        setTimeout(() => dino.classList.remove("jump"), 500);
       }
     });
 
-    // Obstacle generator
+    // Obstacle
     function createObstacle() {
+      if (isGameOver) return;
+
       const obstacle = document.createElement("div");
       obstacle.classList.add("obstacle");
-      obstacle.style.right = "-20px";
+      obstacle.style.right = "-30px";
       game.appendChild(obstacle);
 
-      // Move & remove
-      const moveInterval = setInterval(() => {
+      const checkCollision = setInterval(() => {
+        if (isGameOver) {
+          clearInterval(checkCollision);
+          return;
+        }
+
         const dinoRect = dino.getBoundingClientRect();
         const obsRect = obstacle.getBoundingClientRect();
 
-        // Collision detection
         if (
           obsRect.left < dinoRect.right &&
           obsRect.right > dinoRect.left &&
           obsRect.bottom > dinoRect.top &&
           obsRect.top < dinoRect.bottom
         ) {
-          alert("Game Over!");
-          location.reload();
-        }
-
-        // Remove when out of screen
-        if (obsRect.right > window.innerWidth + 50) {
-          clearInterval(moveInterval);
-          obstacle.remove();
+          endGame();
+          clearInterval(checkCollision);
         }
       }, 10);
 
+      // Cleanup
+      obstacle.addEventListener("animationiteration", () => {
+        obstacle.remove();
+      });
+
       // Repeat
-      setTimeout(createObstacle, Math.random() * 2000 + 1000);
+      setTimeout(createObstacle, Math.random() * 2000 + 800);
     }
 
     createObstacle();
+
+    // Score
+    const scoreInterval = setInterval(() => {
+      if (!isGameOver) {
+        score++;
+        scoreDisplay.textContent = `Score: ${score}`;
+      }
+    }, 100);
+
+    // Game Over
+    function endGame() {
+      isGameOver = true;
+      gameOverScreen.style.display = "block";
+    }
+
+    restartBtn.onclick = () => location.reload();
+
+    // Night mode toggle
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("night");
+      toggleBtn.textContent = document.body.classList.contains("night") ? "☀️" : "🌙";
+    });
   </script>
 </body>
 </html>
+
 
