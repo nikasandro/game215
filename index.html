@@ -75,7 +75,7 @@
       top: 40px;
     }
 
-    #nightToggle {
+    #nightToggle, #soundToggle {
       position: absolute;
       top: 10px;
       left: 20px;
@@ -84,6 +84,10 @@
       padding: 5px 10px;
       background: #eee;
       border-radius: 10px;
+    }
+
+    #soundToggle {
+      left: 90px;
     }
 
     #gameOver {
@@ -119,15 +123,25 @@
       background: #222;
     }
 
-    .night #score, .night #highscore, .night #nightToggle {
+    .night #score, .night #highscore, .night #nightToggle, .night #soundToggle {
       color: #fff;
+    }
+
+    #ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 5px;
+      background: #555;
     }
   </style>
 </head>
 <body>
   <div id="nightToggle">🌙</div>
+  <div id="soundToggle">🔊</div>
   <div id="game">
     <div id="dino"></div>
+    <div id="ground"></div>
     <div id="score">Score: 0</div>
     <div id="highscore">High Score: 0</div>
     <div id="gameOver">
@@ -147,52 +161,63 @@
     const gameOverScreen = document.getElementById("gameOver");
     const restartBtn = document.getElementById("restart");
     const toggleBtn = document.getElementById("nightToggle");
+    const soundToggle = document.getElementById("soundToggle");
     const jumpSound = document.getElementById("jumpSound");
     const gameOverSound = document.getElementById("gameOverSound");
 
     let score = 0;
     let speed = 2;
     let isGameOver = false;
+    let isPaused = false;
+    let soundOn = true;
     let highScore = localStorage.getItem("dinoHighScore") || 0;
     highScoreDisplay.textContent = `High Score: ${highScore}`;
 
-    document.addEventListener("keydown", e => {
-      if ((e.code === "Space" || e.key === "ArrowUp") && !dino.classList.contains("jump")) {
+    function playSound(sound) {
+      if (soundOn) sound.play();
+    }
+
+    function jump() {
+      if (!dino.classList.contains("jump")) {
         dino.classList.add("jump");
-        jumpSound.play();
+        playSound(jumpSound);
         setTimeout(() => dino.classList.remove("jump"), 500);
       }
+    }
+
+    document.addEventListener("keydown", e => {
+      if ((e.code === "Space" || e.key === "ArrowUp") && !isPaused) jump();
+      if (e.key.toLowerCase() === "p") isPaused = !isPaused;
+    });
+
+    document.addEventListener("touchstart", () => {
+      if (!isPaused) jump();
     });
 
     function createObstacle() {
       if (isGameOver) return;
-
       const obstacle = document.createElement("div");
       obstacle.classList.add("obstacle");
       obstacle.style.left = `${window.innerWidth}px`;
       game.appendChild(obstacle);
 
       let obsLeft = window.innerWidth;
-
       const moveInterval = setInterval(() => {
-        if (isGameOver) {
-          clearInterval(moveInterval);
-          return;
-        }
-
+        if (isGameOver || isPaused) return;
         obsLeft -= speed * 4;
         obstacle.style.left = `${obsLeft}px`;
 
         const dinoRect = dino.getBoundingClientRect();
         const obsRect = obstacle.getBoundingClientRect();
+        const buffer = 10;
 
         if (
-          obsRect.left < dinoRect.right &&
-          obsRect.right > dinoRect.left &&
-          obsRect.bottom > dinoRect.top &&
-          obsRect.top < dinoRect.bottom
+          obsRect.left + buffer < dinoRect.right - buffer &&
+          obsRect.right - buffer > dinoRect.left + buffer &&
+          obsRect.bottom - buffer > dinoRect.top + buffer &&
+          obsRect.top + buffer < dinoRect.bottom - buffer
         ) {
-          gameOverSound.play();
+          playSound(gameOverSound);
           endGame();
           clearInterval(moveInterval);
         }
@@ -220,13 +245,17 @@
     createObstacle();
     createCloud();
 
-    const scoreInterval = setInterval(() => {
-      if (!isGameOver) {
-        score++;
-        scoreDisplay.textContent = `Score: ${score}`;
-        if (score % 100 === 0) speed += 0.2;
-      }
-    }, 100);
+    let scoreInterval = null;
+    function startScoreInterval() {
+      scoreInterval = setInterval(() => {
+        if (!isGameOver && !isPaused) {
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+          if (score % 100 === 0) speed += 0.2;
+        }
+      }, 100);
+    }
+    startScoreInterval();
 
     function endGame() {
       isGameOver = true;
@@ -244,7 +273,11 @@
       document.body.classList.toggle("night");
       toggleBtn.textContent = document.body.classList.contains("night") ? "☀️" : "🌙";
     };
+
+    soundToggle.onclick = () => {
+      soundOn = !soundOn;
+      soundToggle.textContent = soundOn ? "🔊" : "🔇";
+    };
   </script>
 </body>
 </html>
-
