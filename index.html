@@ -27,7 +27,7 @@
       left: 50px;
       width: 48px;
       height: 48px;
-      background: url('https://i.imgur.com/OV8I1DQ.png') no-repeat center/cover;
+      background: url('dinosaur.png') no-repeat center/cover;
     }
 
     .obstacle {
@@ -35,7 +35,7 @@
       bottom: 0;
       width: 30px;
       height: 50px;
-      background: url('https://i.imgur.com/N5uCbDu.png') no-repeat center/cover;
+      background: url('cactus.png') no-repeat center/cover;
     }
 
     .cloud {
@@ -169,11 +169,20 @@
 
       const obstacle = document.createElement("div");
       obstacle.classList.add("obstacle");
-      obstacle.style.right = "-30px";
-      obstacle.style.animation = `moveObstacle ${2 / (speed / 2)}s linear forwards`;
+      obstacle.style.left = `${window.innerWidth}px`;
       game.appendChild(obstacle);
 
-      function move() {
+      let obsLeft = window.innerWidth;
+
+      const moveInterval = setInterval(() => {
+        if (isGameOver) {
+          clearInterval(moveInterval);
+          return;
+        }
+
+        obsLeft -= speed * 4;
+        obstacle.style.left = `${obsLeft}px`;
+
         const dinoRect = dino.getBoundingClientRect();
         const obsRect = obstacle.getBoundingClientRect();
 
@@ -185,16 +194,14 @@
         ) {
           gameOverSound.play();
           endGame();
+          clearInterval(moveInterval);
         }
 
-        if (obsRect.right > window.innerWidth + 50) {
+        if (obsLeft + obstacle.offsetWidth < 0) {
           obstacle.remove();
+          clearInterval(moveInterval);
         }
-
-        if (!isGameOver) requestAnimationFrame(move);
-      }
-
-      requestAnimationFrame(move);
+      }, 20);
 
       setTimeout(createObstacle, Math.random() * 1500 + 800);
     }
@@ -206,10 +213,7 @@
       cloud.style.right = "-60px";
       game.appendChild(cloud);
 
-      setTimeout(() => {
-        cloud.remove();
-      }, 20000);
-
+      setTimeout(() => cloud.remove(), 20000);
       setTimeout(createCloud, Math.random() * 4000 + 2000);
     }
 
@@ -220,7 +224,7 @@
       if (!isGameOver) {
         score++;
         scoreDisplay.textContent = `Score: ${score}`;
-        if (score % 100 === 0) speed += 0.2; // Increase speed every 100 points
+        if (score % 100 === 0) speed += 0.2;
       }
     }, 100);
 
@@ -243,6 +247,4 @@
   </script>
 </body>
 </html>
-
-
 
