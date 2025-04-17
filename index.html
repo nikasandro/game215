@@ -101,7 +101,6 @@
   </div>
 
   <script>
-    let soundOn = true;
     let isNight = false;
     let gameOver = false;
     let score = 0;
@@ -132,27 +131,19 @@
     const game = new Phaser.Game(config);
 
     let dino, obstacles, clouds, ground;
-    let cursors, scoreText;
-    let jumpSound, gameOverSound;
+    let cursors;
     let paused = false;
 
     function preload() {
-      // Load images
+      // Load assets (no sounds)
       this.load.image('dino', 'https://nikasandro.github.io/game215/dinosaur.png');
       this.load.image('cactus', 'https://nikasandro.github.io/game215/cactus.png');
       this.load.image('cloud', 'https://nikasandro.github.io/game215/cloud.png');
-
-      // Load audio (updated to local paths or direct URLs)
-      this.load.audio('jumpSound', 'https://www.soundjay.com/button/beep-07.wav'); // URL or local path
-      this.load.audio('gameOverSound', 'https://www.soundjay.com/button/beep-10.wav'); // URL or local path
     }
 
     function create() {
       // Initialize game
       this.cameras.main.setBackgroundColor('#ffffff');
-
-      jumpSound = this.sound.add('jumpSound');
-      gameOverSound = this.sound.add('gameOverSound');
 
       // Create clouds
       clouds = this.physics.add.group();
@@ -240,13 +231,11 @@
     function jump() {
       if (!gameOver && dino.body.touching.down) {
         dino.setVelocityY(-500);
-        if (soundOn) jumpSound.play();
       }
     }
 
     function handleGameOver(scene) {
       gameOver = true;
-      if (soundOn) gameOverSound.play();
       document.getElementById("gameOver").style.display = "block";
       if (score > highScore) {
         highScore = score;
@@ -262,15 +251,10 @@
       game.scene.scenes[0].cameras.main.setBackgroundColor(isNight ? "#222" : "#ffffff");
       document.getElementById("nightToggle").textContent = isNight ? "☀️" : "🌙";
     };
-
-    // Sound toggle
-    document.getElementById("soundToggle").onclick = () => {
-      soundOn = !soundOn;
-      document.getElementById("soundToggle").textContent = soundOn ? "🔊" : "🔇";
-    };
   </script>
 </body>
 </html>
+
 
 
 
