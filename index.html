@@ -106,7 +106,7 @@
     let gameOver = false;
     let score = 0;
     let highScore = localStorage.getItem("dinoHighScore") || 0;
-    let speed = 300;
+    let speed = 200;
 
     document.getElementById("highscore").textContent = `High Score: ${highScore}`;
 
@@ -131,7 +131,7 @@
 
     const game = new Phaser.Game(config);
 
-    let dino, obstacles, clouds;
+    let dino, obstacles, clouds, ground;
     let cursors, scoreText;
     let jumpSound, gameOverSound;
     let paused = false;
@@ -164,6 +164,10 @@
         }
       });
 
+      // Ground
+      ground = this.physics.add.staticGroup();
+      ground.create(0, config.height - 50, 'cactus').setScale(2).refreshBody();
+
       // Dino
       dino = this.physics.add.sprite(100, config.height - 100, 'dino').setScale(1).setCollideWorldBounds(true);
       dino.setSize(48, 48);
@@ -192,6 +196,8 @@
       this.physics.add.collider(dino, obstacles, () => {
         if (!gameOver) handleGameOver(this);
       });
+
+      this.physics.add.collider(dino, ground);
 
       this.time.addEvent({
         delay: 100,
@@ -261,5 +267,6 @@
   </script>
 </body>
 </html>
+
 
 
