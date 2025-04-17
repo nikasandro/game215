@@ -137,21 +137,22 @@
     let paused = false;
 
     function preload() {
-      // Correct asset paths
-      this.load.image('dino', 'https://nikasandro.github.io/game215/dinosaur.png');  // Adjust this path
-      this.load.image('cactus', 'https://nikasandro.github.io/game215/cactus.png');  // Adjust this path
-      this.load.image('cloud', 'https://nikasandro.github.io/game215/cloud.png');    // Adjust this path
+      // Ensure these paths are correct and accessible
+      this.load.image('dino', 'https://nikasandro.github.io/game215/dinosaur.png');
+      this.load.image('cactus', 'https://nikasandro.github.io/game215/cactus.png');
+      this.load.image('cloud', 'https://nikasandro.github.io/game215/cloud.png');
       this.load.audio('jumpSound', 'https://www.soundjay.com/button/beep-07.wav');
       this.load.audio('gameOverSound', 'https://www.soundjay.com/button/beep-10.wav');
     }
 
     function create() {
+      // Initialize game
       this.cameras.main.setBackgroundColor('#ffffff');
 
       jumpSound = this.sound.add('jumpSound');
       gameOverSound = this.sound.add('gameOverSound');
 
-      // Clouds
+      // Create clouds
       clouds = this.physics.add.group();
       this.time.addEvent({
         delay: 4000,
@@ -165,15 +166,15 @@
         }
       });
 
-      // Ground
+      // Create ground
       ground = this.physics.add.staticGroup();
       ground.create(0, config.height - 50, 'cactus').setScale(2).refreshBody();
 
-      // Dino
+      // Create dino
       dino = this.physics.add.sprite(100, config.height - 100, 'dino').setScale(1).setCollideWorldBounds(true);
       dino.setSize(48, 48);
 
-      // Obstacles
+      // Create obstacles
       obstacles = this.physics.add.group();
 
       this.time.addEvent({
@@ -212,7 +213,7 @@
         }
       });
 
-      // Restart
+      // Restart game
       document.getElementById("restart").onclick = () => location.reload();
     }
 
@@ -224,7 +225,7 @@
         jump();
       }
 
-      // Cleanup
+      // Cleanup obstacles and clouds
       obstacles.getChildren().forEach(obs => {
         if (obs.x < -50) obs.destroy();
       });
@@ -252,7 +253,7 @@
       }
     }
 
-    // Night toggle
+    // Night mode toggle
     document.getElementById("nightToggle").onclick = () => {
       isNight = !isNight;
       document.body.classList.toggle("night");
@@ -268,6 +269,7 @@
   </script>
 </body>
 </html>
+
 
 
 
