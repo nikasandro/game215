@@ -137,12 +137,14 @@
     let paused = false;
 
     function preload() {
-      // Ensure these paths are correct and accessible
+      // Load images
       this.load.image('dino', 'https://nikasandro.github.io/game215/dinosaur.png');
       this.load.image('cactus', 'https://nikasandro.github.io/game215/cactus.png');
       this.load.image('cloud', 'https://nikasandro.github.io/game215/cloud.png');
-      this.load.audio('jumpSound', 'https://www.soundjay.com/button/beep-07.wav');
-      this.load.audio('gameOverSound', 'https://www.soundjay.com/button/beep-10.wav');
+
+      // Load audio (updated to local paths)
+      this.load.audio('jumpSound', 'sounds/beep-07.wav'); // Replace with local path
+      this.load.audio('gameOverSound', 'sounds/beep-10.wav'); // Replace with local path
     }
 
     function create() {
@@ -269,6 +271,7 @@
   </script>
 </body>
 </html>
+
 
 
 
