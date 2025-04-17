@@ -137,9 +137,10 @@
     let paused = false;
 
     function preload() {
-      this.load.image('dino', 'dinosaur.png');
-      this.load.image('cactus', 'cactus.png');
-      this.load.image('cloud', 'cloud.png');
+      // Correct asset paths
+      this.load.image('dino', 'https://nikasandro.github.io/game215/dinosaur.png');  // Adjust this path
+      this.load.image('cactus', 'https://nikasandro.github.io/game215/cactus.png');  // Adjust this path
+      this.load.image('cloud', 'https://nikasandro.github.io/game215/cloud.png');    // Adjust this path
       this.load.audio('jumpSound', 'https://www.soundjay.com/button/beep-07.wav');
       this.load.audio('gameOverSound', 'https://www.soundjay.com/button/beep-10.wav');
     }
