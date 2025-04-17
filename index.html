@@ -28,7 +28,6 @@
       width: 48px;
       height: 48px;
       background: url('dinosaur.png') no-repeat center/cover;
-      z-index: 2;
     }
 
     .obstacle {
@@ -37,7 +36,6 @@
       width: 30px;
       height: 50px;
       background: url('cactus.png') no-repeat center/cover;
-      z-index: 2;
     }
 
     .cloud {
@@ -45,10 +43,9 @@
       top: 30px;
       width: 60px;
       height: 30px;
-      background: url('https://i.imgur.com/JYUCNdn.png') no-repeat center/cover;
+      background: url('cloud.png') no-repeat center/cover;
       opacity: 0.5;
       animation: drift 20s linear infinite;
-      z-index: 1;
     }
 
     @keyframes drift {
@@ -136,7 +133,6 @@
       width: 100%;
       height: 5px;
       background: #555;
-      z-index: 2;
     }
   </style>
 </head>
@@ -238,24 +234,16 @@
     function createCloud() {
       const cloud = document.createElement("div");
       cloud.classList.add("cloud");
-
-      const size = Math.random() * 0.5 + 0.75; // Scale from 0.75 to 1.25
-      cloud.style.transform = `scale(${size})`;
       cloud.style.top = `${Math.random() * 50 + 20}px`;
       cloud.style.right = "-60px";
-      cloud.style.animationDuration = `${15 + Math.random() * 10}s`;
-
       game.appendChild(cloud);
 
-      setTimeout(() => cloud.remove(), 25000);
+      setTimeout(() => cloud.remove(), 20000);
       setTimeout(createCloud, Math.random() * 4000 + 2000);
     }
 
-    // Start clouds and obstacles
     createObstacle();
     createCloud();
-    setTimeout(createCloud, 1000);
-    setTimeout(createCloud, 2000);
 
     let scoreInterval = null;
     function startScoreInterval() {
@@ -293,3 +281,4 @@
   </script>
 </body>
 </html>
+
