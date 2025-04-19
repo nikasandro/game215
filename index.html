@@ -2,25 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Super Dino Game (Phaser)</title>
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+  <title>Super Dino Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f4f4;
       overflow: hidden;
+      transition: background 0.3s;
     }
 
-    #gameContainer {
+    #game {
       position: relative;
       width: 100vw;
       height: 100vh;
+      background: #fff;
       overflow: hidden;
+      border-bottom: 3px solid #444;
     }
 
     canvas {
-      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
     }
 
     #score, #highscore {
@@ -59,7 +65,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
-      z-index: 3;
+      z-index: 2;
     }
 
     #gameOver h1 {
@@ -82,16 +88,20 @@
       background: #111;
     }
 
+    .night #game {
+      background: #222;
+    }
+
     .night #score, .night #highscore, .night #nightToggle, .night #soundToggle {
       color: #fff;
-      background: #333;
+      background: #444;
     }
   </style>
 </head>
 <body>
   <div id="nightToggle">🌙</div>
   <div id="soundToggle">🔊</div>
-  <div id="gameContainer">
+  <div id="game">
     <div id="score">Score: 0</div>
     <div id="highscore">High Score: 0</div>
     <div id="gameOver">
@@ -100,20 +110,42 @@
     </div>
   </div>
 
-  <script>
-    let isNight = false;
-    let gameOver = false;
-    let score = 0;
-    let highScore = localStorage.getItem("dinoHighScore") || 0;
-    let speed = 200;
+  <audio id="jumpSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+  <audio id="gameOverSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
 
-    document.getElementById("highscore").textContent = `High Score: ${highScore}`;
+  <script>
+    const scoreDisplay = document.getElementById("score");
+    const highScoreDisplay = document.getElementById("highscore");
+    const gameOverScreen = document.getElementById("gameOver");
+    const restartBtn = document.getElementById("restart");
+    const toggleBtn = document.getElementById("nightToggle");
+    const soundToggle = document.getElementById("soundToggle");
+    const jumpSound = document.getElementById("jumpSound");
+    const gameOverSound = document.getElementById("gameOverSound");
+
+    let soundOn = true;
+    let highScore = localStorage.getItem("dinoHighScore") || 0;
+    highScoreDisplay.textContent = `High Score: ${highScore}`;
+
+    toggleBtn.onclick = () => {
+      document.body.classList.toggle("night");
+      toggleBtn.textContent = document.body.classList.contains("night") ? "☀️" : "🌙";
+    };
+
+    soundToggle.onclick = () => {
+      soundOn = !soundOn;
+      soundToggle.textContent = soundOn ? "🔊" : "🔇";
+    };
+
+    function playSound(sound) {
+      if (soundOn) sound.play();
+    }
 
     const config = {
       type: Phaser.AUTO,
+      parent: 'game',
       width: window.innerWidth,
       height: window.innerHeight,
-      parent: 'gameContainer',
       physics: {
         default: 'arcade',
         arcade: {
@@ -128,132 +160,97 @@
       }
     };
 
+    let dino, cursors, obstacles, score = 0, scoreTimer, gameOver = false;
+
     const game = new Phaser.Game(config);
 
-    let dino, obstacles, clouds, ground;
-    let cursors;
-    let paused = false;
-
     function preload() {
-      // Load assets (no sounds)
-      this.load.image('dino', 'https://nikasandro.github.io/game215/dinosaur.png');
-      this.load.image('cactus', 'https://nikasandro.github.io/game215/cactus.png');
-      this.load.image('cloud', 'https://nikasandro.github.io/game215/cloud.png');
+      this.load.image('dino', 'dinosaur.png');
+      this.load.image('cactus', 'cactus.png');
     }
 
     function create() {
-      // Initialize game
-      this.cameras.main.setBackgroundColor('#ffffff');
+      const groundY = this.sys.game.config.height - 48;
 
-      // Create clouds
-      clouds = this.physics.add.group();
-      this.time.addEvent({
-        delay: 4000,
-        loop: true,
-        callback: () => {
-          const cloud = this.physics.add.sprite(config.width + 60, Phaser.Math.Between(20, 80), 'cloud');
-          cloud.setVelocityX(-30);
-          cloud.setAlpha(0.5);
-          cloud.setDepth(-1);
-          clouds.add(cloud);
-        }
-      });
+      // Ground
+      const ground = this.add.rectangle(0, groundY, config.width * 2, 10, 0x888888).setOrigin(0, 0);
+      this.physics.add.existing(ground, true);
 
-      // Create ground
-      ground = this.physics.add.staticGroup();
-      ground.create(0, config.height - 50, 'cactus').setScale(2).refreshBody();
-
-      // Create dino
-      dino = this.physics.add.sprite(100, config.height - 100, 'dino').setScale(1).setCollideWorldBounds(true);
-      dino.setSize(48, 48);
-
-      // Create obstacles
-      obstacles = this.physics.add.group();
-
-      this.time.addEvent({
-        delay: 1500,
-        loop: true,
-        callback: () => {
-          if (!gameOver && !paused) {
-            const obs = obstacles.create(config.width + 50, config.height - 50, 'cactus');
-            obs.setVelocityX(-speed);
-            obs.setSize(30, 50);
-            obs.setImmovable(true);
-          }
-        }
-      });
-
-      cursors = this.input.keyboard.createCursorKeys();
-      this.input.keyboard.on('keydown-P', () => paused = !paused);
-      this.input.keyboard.on('keydown-SPACE', jump);
-      this.input.on('pointerdown', jump);
-
-      this.physics.add.collider(dino, obstacles, () => {
-        if (!gameOver) handleGameOver(this);
-      });
-
+      // Dino
+      dino = this.physics.add.sprite(50, groundY - 48, 'dino').setOrigin(0, 0).setScale(1);
+      dino.setCollideWorldBounds(true);
       this.physics.add.collider(dino, ground);
 
+      // Input
+      cursors = this.input.keyboard.createCursorKeys();
+      this.input.on('pointerdown', jump, this);
+
+      // Obstacles
+      obstacles = this.physics.add.group();
+      this.physics.add.collider(obstacles, ground);
+      this.physics.add.overlap(dino, obstacles, hitObstacle, null, this);
+
+      // Obstacle generator
       this.time.addEvent({
+        delay: Phaser.Math.Between(1000, 1800),
+        loop: true,
+        callback: () => {
+          if (gameOver) return;
+          const obs = obstacles.create(config.width, groundY - 50, 'cactus').setOrigin(0, 0);
+          obs.setVelocityX(-300);
+          obs.setImmovable(true);
+          obs.body.allowGravity = false;
+        }
+      });
+
+      // Score
+      scoreTimer = this.time.addEvent({
         delay: 100,
         loop: true,
         callback: () => {
-          if (!paused && !gameOver) {
+          if (!gameOver) {
             score++;
-            document.getElementById("score").textContent = `Score: ${score}`;
-            if (score % 100 === 0) speed += 20;
+            scoreDisplay.textContent = `Score: ${score}`;
           }
         }
       });
-
-      // Restart game
-      document.getElementById("restart").onclick = () => location.reload();
     }
 
     function update() {
-      if (paused || gameOver) return;
-
-      // Jump logic
-      if (cursors.up.isDown && dino.body.touching.down) {
+      if ((Phaser.Input.Keyboard.JustDown(cursors.space) || Phaser.Input.Keyboard.JustDown(cursors.up)) && dino.body.touching.down) {
         jump();
       }
-
-      // Cleanup obstacles and clouds
-      obstacles.getChildren().forEach(obs => {
-        if (obs.x < -50) obs.destroy();
-      });
-
-      clouds.getChildren().forEach(cloud => {
-        if (cloud.x < -100) cloud.destroy();
-      });
     }
 
     function jump() {
-      if (!gameOver && dino.body.touching.down) {
-        dino.setVelocityY(-500);
+      if (dino.body.touching.down && !gameOver) {
+        dino.setVelocityY(-450);
+        playSound(jumpSound);
       }
     }
 
-    function handleGameOver(scene) {
-      gameOver = true;
-      document.getElementById("gameOver").style.display = "block";
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem("dinoHighScore", highScore);
-        document.getElementById("highscore").textContent = `High Score: ${highScore}`;
+    function hitObstacle(player, obstacle) {
+      if (!gameOver) {
+        gameOver = true;
+        scoreTimer.remove(false);
+        playSound(gameOverSound);
+        gameOverScreen.style.display = "block";
+
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("dinoHighScore", highScore);
+          highScoreDisplay.textContent = `High Score: ${highScore}`;
+        }
+
+        this.physics.pause();
       }
     }
 
-    // Night mode toggle
-    document.getElementById("nightToggle").onclick = () => {
-      isNight = !isNight;
-      document.body.classList.toggle("night");
-      game.scene.scenes[0].cameras.main.setBackgroundColor(isNight ? "#222" : "#ffffff");
-      document.getElementById("nightToggle").textContent = isNight ? "☀️" : "🌙";
-    };
+    restartBtn.onclick = () => location.reload();
   </script>
 </body>
 </html>
+
 
 
 
