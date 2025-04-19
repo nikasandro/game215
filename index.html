@@ -226,7 +226,9 @@
     function spawnObstacle() {
       if (gameOver) return;
       const groundY = this.sys.game.config.height - groundHeight;
-      const cactus = obstacles.create(config.width, groundY - 50, "cactus"); // Spawn above ground
+
+      // Fix the spawn position for the cactus
+      const cactus = obstacles.create(config.width, groundY - 50, "cactus"); // Spawning above the ground
       cactus.setOrigin(0, 0);
       cactus.setImmovable(true);
       cactus.setVelocityX(-speed);
