@@ -171,9 +171,11 @@
     function create() {
       const groundY = this.sys.game.config.height - groundHeight;
 
-      const ground = this.add.rectangle(0, groundY, config.width * 2, 10, 0x555555).setOrigin(0, 0);
-      this.physics.add.existing(ground, true);
-
+      // Create ground rectangle
+      const ground = this.add.rectangle(0, groundY, config.width * 2, groundHeight, 0x555555).setOrigin(0, 0);
+      this.physics.add.existing(ground, true); // Ensure ground is immovable and interacts with physics
+      
+      // Ensure the dino is positioned above the ground
       dino = this.physics.add.sprite(50, groundY - 48, "dino").setOrigin(0, 0);
       dino.setDisplaySize(48, 48);
       dino.setCollideWorldBounds(true);
@@ -265,3 +267,4 @@
   </script>
 </body>
 </html>
+
