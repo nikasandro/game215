@@ -174,7 +174,7 @@
       // Create ground rectangle
       const ground = this.add.rectangle(0, groundY, config.width * 2, groundHeight, 0x555555).setOrigin(0, 0);
       this.physics.add.existing(ground, true); // Ensure ground is immovable and interacts with physics
-      
+
       // Ensure the dino is positioned above the ground
       dino = this.physics.add.sprite(50, groundY - 48, "dino").setOrigin(0, 0);
       dino.setDisplaySize(48, 48);
@@ -225,12 +225,16 @@
 
     function spawnObstacle() {
       if (gameOver) return;
-      const cactus = obstacles.create(config.width, config.height - groundHeight - 50, "cactus");
+      const groundY = this.sys.game.config.height - groundHeight;
+
+      // Fix the spawn position for the cactus
+      const cactus = obstacles.create(config.width, groundY - 50, "cactus"); // Spawning above the ground
       cactus.setOrigin(0, 0);
-      cactus.setImmovable(true);
+      cactus.setImmovable(true);  // Make sure it doesn’t fall
       cactus.setVelocityX(-speed);
       cactus.setSize(30, 50, true);
       cactus.setDisplaySize(30, 50);
+      cactus.body.setAllowGravity(false); // Prevent gravity from affecting the cactus
     }
 
     function spawnCloud() {
